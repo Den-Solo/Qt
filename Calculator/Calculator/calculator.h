@@ -23,5 +23,12 @@ private slots:
     void MathButtonPressed();
     void EqualButton();
     void ChangeNumberSign();
+
+private:
+    double calcVal = 0.0;
+    bool divTrigger = false;
+    bool multTrigger = false;
+    bool addTrigger = false;
+    bool subTrigger = false;
 };
 #endif // CALCULATOR_H

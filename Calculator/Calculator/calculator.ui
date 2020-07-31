@@ -129,7 +129,7 @@ QPushButton:hover {
      </widget>
     </item>
     <item row="5" column="2">
-     <widget class="QPushButton" name="ButtonSign">
+     <widget class="QPushButton" name="ButtonChangeSign">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -215,7 +215,7 @@ QPushButton:hover {
      </widget>
     </item>
     <item row="4" column="3">
-     <widget class="QPushButton" name="ButtonPlus">
+     <widget class="QPushButton" name="ButtonAdd">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -338,7 +338,7 @@ QPushButton:hover {
      </widget>
     </item>
     <item row="5" column="3">
-     <widget class="QPushButton" name="ButtonMinus">
+     <widget class="QPushButton" name="ButtonSub">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>

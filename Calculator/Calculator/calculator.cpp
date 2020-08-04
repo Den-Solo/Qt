@@ -12,15 +12,15 @@ Calculator::Calculator(QWidget *parent)
 
     ui->Display->setText(QString::number(calcVal));
 
-    QPushButton *numButtons[10];
-    for (int i = 0; i < 10; ++i){
-        QString butName = "Button" + QString::number(i);
-        numButtons[i] = Calculator::findChild<QPushButton *>(butName);
-        connect(numButtons[i], SIGNAL(released()),
-                this, SLOT(NumPressed()));
 
+    for (int i = 0; i < 11; ++i){
+        QString butName = "Button" + QString::number(i);
+        connect(Calculator::findChild<QPushButton *>(butName), SIGNAL(released()),
+                this, SLOT(NumPressed()));
     }
 
+    connect(ui->Button10, SIGNAL(released()),
+            this, SLOT(NumPressed()));
     connect(ui->ButtonDiv, SIGNAL(released()),
             this, SLOT(MathButtonPressed()));
     connect(ui->ButtonMult, SIGNAL(released()),
@@ -46,24 +46,37 @@ void Calculator::NumPressed(){
     QPushButton *button = (QPushButton*)sender();
     QString butVal = button->text();
     QString displayVal = ui->Display->text();
-    if (displayVal.toDouble() == 0 || displayVal.toDouble() == 0.0){
-        ui->Display->setText(butVal);
-    } else {
-        QString newVal = displayVal + butVal;
-        double dblNewVal = newVal.toDouble();
-        ui->Display->setText(QString::number(dblNewVal, 'g', 16));
+
+    if (butVal == "."){
+        if (displayVal == "0"){
+            ui->Display->setText("0.");
+            return;
+        }
+        else if (displayVal.contains('.')){
+            return;
+        }
     }
+
+    if (displayVal == "0")
+        ui->Display->setText(butVal);
+    else
+        ui->Display->setText(displayVal + butVal);
+
 }
 
 
 
 void Calculator::MathButtonPressed(){
-    divTrigger = false;
-    multTrigger = false;
-    addTrigger = false;
-    subTrigger = false;
 
     QString displayVal = ui->Display->text();
+
+    if ((addTrigger || subTrigger || multTrigger || divTrigger) && displayVal != ""){
+         EqualButton(true);
+    }
+
+    DisableTriggers();
+
+    displayVal = ui->Display->text();
     calcVal = displayVal.toDouble();
     QPushButton *button = (QPushButton*)sender();
     QString butVal = button->text();
@@ -77,13 +90,25 @@ void Calculator::MathButtonPressed(){
     }else  if (QString::compare(butVal, "-", Qt::CaseSensitive) == 0){
         subTrigger = true;
     }
-    ui->Display->setText("");
+
+    if (displayVal != "")
+        ui->DisplaySupport->setText(displayVal + ' ' + butVal);
+    else {
+        displayVal = ui->DisplaySupport->text();
+        displayVal.back() = butVal[0];
+        ui->DisplaySupport->setText(displayVal);
+    }
+    ui->Display->setText("0");
 }
 
-void Calculator::EqualButton(){
-    double solution = 0.0;
-    double dblDisplayVal = ui->Display->text().toDouble();
+void Calculator::EqualButton(bool intermediate)
+{
     if (addTrigger || subTrigger || multTrigger || divTrigger){
+        double solution = 0.0;
+
+        QString displayVal = ui->Display->text();
+        double dblDisplayVal = displayVal.toDouble();
+
         if (addTrigger)
             solution = calcVal + dblDisplayVal;
         else if (subTrigger)
@@ -92,21 +117,46 @@ void Calculator::EqualButton(){
             solution = calcVal * dblDisplayVal;
         else
             solution = calcVal / dblDisplayVal;
+
+        ui->Display->setText(QString::number(solution, 'g', 16));
+        if (!intermediate){
+            ui->DisplaySupport->setText(ui->DisplaySupport->text() + ' ' + displayVal + " =");
+        }
+        DisableTriggers();
     }
-    ui->Display->setText(QString::number(solution));
+
 }
 
 void Calculator::ChangeNumberSign(){
-    QString displayVal = ui->Display->text();
-    QRegExp reg("[-]?[0-9.]*");
-    if (reg.exactMatch(displayVal)){
-        double dblDisplayVal = displayVal.toDouble();
-        double dblDisplayValSign = -1 * dblDisplayVal;
-        ui->Display->setText(QString::number(dblDisplayValSign));
-    }
+    ui->Display->setText(QString::number( ui->Display->text().toDouble() * -1, 'g', 16));
 }
 
 
 
 
+void Calculator::on_ButtonAC_released()
+{
+    DisableTriggers();
 
+    calcVal = 0.0;
+    ui->Display->setText("0");
+    ui->DisplaySupport->setText("");
+}
+
+void Calculator::on_pushButton_released()
+{
+    QString displayVal = ui->Display->text();
+    if (displayVal.size() > 1){
+        ui->Display->setText(displayVal.mid(0, displayVal.size() - 1));
+    }else{
+        ui->Display->setText("0");
+    }
+}
+
+
+void Calculator::DisableTriggers(){
+    divTrigger = false;
+    multTrigger = false;
+    addTrigger = false;
+    subTrigger = false;
+}

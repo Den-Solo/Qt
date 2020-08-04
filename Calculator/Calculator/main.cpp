@@ -1,6 +1,7 @@
 #include "calculator.h"
 
 #include <QApplication>
+#include <QShortcut>
 
 int main(int argc, char *argv[])
 {

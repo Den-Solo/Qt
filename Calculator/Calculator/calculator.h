@@ -21,8 +21,12 @@ private:
 private slots:
     void NumPressed();
     void MathButtonPressed();
-    void EqualButton();
+    void EqualButton(bool intermediate = false);
     void ChangeNumberSign();
+    void DisableTriggers();
+
+    void on_ButtonAC_released();
+    void on_pushButton_released();
 
 private:
     double calcVal = 0.0;

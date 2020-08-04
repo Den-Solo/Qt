@@ -31,8 +31,7 @@ Calculator::Calculator(QWidget *parent)
             this, SLOT(MathButtonPressed()));
     connect(ui->ButtonEq, SIGNAL(released()),
             this, SLOT(EqualButton()));
-    connect(ui->ButtonChangeSign, SIGNAL(released()),
-            this, SLOT(ChangeNumberSign()));
+
 }
 
 Calculator::~Calculator()
@@ -70,14 +69,14 @@ void Calculator::MathButtonPressed(){
 
     QString displayVal = ui->Display->text();
 
-    if ((addTrigger || subTrigger || multTrigger || divTrigger) && displayVal != ""){
+    if (displayVal != "0"){
          EqualButton(true);
     }
-
     DisableTriggers();
 
     displayVal = ui->Display->text();
-    calcVal = displayVal.toDouble();
+    if (calcVal == 0.0)
+        calcVal = displayVal.toDouble();
     QPushButton *button = (QPushButton*)sender();
     QString butVal = button->text();
     if (QString::compare(butVal, "/", Qt::CaseSensitive) == 0){
@@ -91,8 +90,8 @@ void Calculator::MathButtonPressed(){
         subTrigger = true;
     }
 
-    if (displayVal != "")
-        ui->DisplaySupport->setText(displayVal + ' ' + butVal);
+    if (displayVal != "0")
+        ui->DisplaySupport->setText(QString::number(calcVal) + ' ' + butVal);
     else {
         displayVal = ui->DisplaySupport->text();
         displayVal.back() = butVal[0];
@@ -104,21 +103,20 @@ void Calculator::MathButtonPressed(){
 void Calculator::EqualButton(bool intermediate)
 {
     if (addTrigger || subTrigger || multTrigger || divTrigger){
-        double solution = 0.0;
 
         QString displayVal = ui->Display->text();
         double dblDisplayVal = displayVal.toDouble();
 
         if (addTrigger)
-            solution = calcVal + dblDisplayVal;
+            calcVal += dblDisplayVal;
         else if (subTrigger)
-            solution = calcVal - dblDisplayVal;
+            calcVal -= dblDisplayVal;
         else if (multTrigger)
-            solution = calcVal * dblDisplayVal;
+            calcVal *= dblDisplayVal;
         else
-            solution = calcVal / dblDisplayVal;
+            calcVal /= dblDisplayVal;
 
-        ui->Display->setText(QString::number(solution, 'g', 16));
+        ui->Display->setText(QString::number(calcVal, 'g', 16));
         if (!intermediate){
             ui->DisplaySupport->setText(ui->DisplaySupport->text() + ' ' + displayVal + " =");
         }
@@ -127,9 +125,6 @@ void Calculator::EqualButton(bool intermediate)
 
 }
 
-void Calculator::ChangeNumberSign(){
-    ui->Display->setText(QString::number( ui->Display->text().toDouble() * -1, 'g', 16));
-}
 
 
 

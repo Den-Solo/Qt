@@ -1,21 +1,18 @@
-#include "calculator.h"
-#include "ui_calculator.h"
+#include "classic.h"
+#include "ui_classic.h"
 
-
-Calculator::Calculator(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::Calculator)
+Classic::Classic(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Classic)
 {
     ui->setupUi(this);
-
-    setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
 
     ui->Display->setText(QString::number(calcVal));
 
 
     for (int i = 0; i < 11; ++i){
         QString butName = "Button" + QString::number(i);
-        connect(Calculator::findChild<QPushButton *>(butName), SIGNAL(released()),
+        connect(Classic::findChild<QPushButton *>(butName), SIGNAL(released()),
                 this, SLOT(NumPressed()));
     }
 
@@ -31,17 +28,15 @@ Calculator::Calculator(QWidget *parent)
             this, SLOT(MathButtonPressed()));
     connect(ui->ButtonEq, SIGNAL(released()),
             this, SLOT(EqualButton()));
-
 }
 
-Calculator::~Calculator()
+Classic::~Classic()
 {
     delete ui;
 }
 
 
-
-void Calculator::NumPressed(){
+void Classic::NumPressed(){
     QPushButton *button = (QPushButton*)sender();
     QString butVal = button->text();
     QString displayVal = ui->Display->text();
@@ -65,7 +60,7 @@ void Calculator::NumPressed(){
 
 
 
-void Calculator::MathButtonPressed(){
+void Classic::MathButtonPressed(){
 
     QString displayVal = ui->Display->text();
 
@@ -79,20 +74,20 @@ void Calculator::MathButtonPressed(){
         calcVal = displayVal.toDouble();
     QPushButton *button = (QPushButton*)sender();
     QString butVal = button->text();
-    if (QString::compare(butVal, "/", Qt::CaseSensitive) == 0){
+    if (butVal == "/"){
         divTrigger = true;
     }
-    else  if (QString::compare(butVal, "*", Qt::CaseSensitive) == 0){
+    else  if (butVal == "*"){
         multTrigger = true;
-    }else  if (QString::compare(butVal, "+", Qt::CaseSensitive) == 0){
+    }else  if (butVal == "+"){
         addTrigger = true;
-    }else  if (QString::compare(butVal, "-", Qt::CaseSensitive) == 0){
+    }else  if (butVal == "-"){
         subTrigger = true;
     }
 
     if (displayVal != "0")
-        ui->DisplaySupport->setText(QString::number(calcVal) + ' ' + butVal);
-    else {
+        ui->DisplaySupport->setText(QString::number(calcVal, 'g',16) + ' ' + butVal);
+    else {//change sign only
         displayVal = ui->DisplaySupport->text();
         if (displayVal.size()){
             displayVal.back() = butVal[0];
@@ -102,7 +97,7 @@ void Calculator::MathButtonPressed(){
     ui->Display->setText("0");
 }
 
-void Calculator::EqualButton(bool intermediate)
+void Classic::EqualButton(bool intermediate)
 {
     if (addTrigger || subTrigger || multTrigger || divTrigger){
 
@@ -131,7 +126,7 @@ void Calculator::EqualButton(bool intermediate)
 
 
 
-void Calculator::on_ButtonAC_released()
+void Classic::on_ButtonAC_released()
 {
     DisableTriggers();
 
@@ -140,7 +135,7 @@ void Calculator::on_ButtonAC_released()
     ui->DisplaySupport->setText("");
 }
 
-void Calculator::on_pushButton_released()
+void Classic::on_pushButton_released()
 {
     QString displayVal = ui->Display->text();
     if (displayVal.size() > 1){
@@ -151,7 +146,7 @@ void Calculator::on_pushButton_released()
 }
 
 
-void Calculator::DisableTriggers(){
+void Classic::DisableTriggers(){
     divTrigger = false;
     multTrigger = false;
     addTrigger = false;
